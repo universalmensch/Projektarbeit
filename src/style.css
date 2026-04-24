@@ -1,5 +1,6 @@
 body {
   background: white;
   display: flex;
+  color: black;
   justify-content: center;
 }
