@@ -116,10 +116,12 @@ const setCellValue = (value: string, row: number, col: number) => {
   align-items: center;
   justify-content: center;
   border: 1px solid lightgray;
+  font-size: 10em;
+  color: darkgray;
 }
 
 .sudoku-cell.is-given {
-
+  color: black;
 }
 
 .border-top-bold {
@@ -128,14 +130,6 @@ const setCellValue = (value: string, row: number, col: number) => {
 
 .border-left-bold {
   border-left: 2px solid darkgrey;
-}
-
-.border-right-bold {
-  border-right: 2px solid darkgrey;
-}
-
-.border-bottom-bold {
-  border-bottom: 2px solid darkgrey;
 }
 
 .sudoku-input {
