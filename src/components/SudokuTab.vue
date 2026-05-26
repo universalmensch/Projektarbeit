@@ -1,12 +1,11 @@
-<script setup lang="ts">
-import { ref } from 'vue';
+<script lang="ts" setup>
+import {ref} from 'vue';
 import type {Cell} from "../types/Cell.ts";
 import {VTextField} from "vuetify/components";
-
-const size = 9;
+import type {NumericSudoku, Sudoku} from "../types/Sudoku.ts";
+import {getRandomSudoku} from "./SudokuManager.ts";
 
 const switchFocusCell = (e: KeyboardEvent, row: number, col: number) => {
-
   switch (e.key) {
     case "ArrowUp":
       if (row > 0) row -= 1;
@@ -25,25 +24,32 @@ const switchFocusCell = (e: KeyboardEvent, row: number, col: number) => {
   }
 
   e.preventDefault();
-  cells.value[row][col].ref?.focus();
+  sudoku.value.cells[row][col].ref?.focus();
 };
 
-const cells = ref<Cell[][]>(
-    Array.from({ length: size }, (_, row) =>
-        Array.from({ length: size }, (_, col) => ({
-          row,
-          col,
-          value: null,
-          given: false,
-          ref: null
-        })) as Cell[]
-    )
+const initSudoku = (newSudoku: NumericSudoku): Sudoku => {
+  return {
+    cells: newSudoku.cells.map((row, rowIndex) =>
+        row.map((cell, cellIndex): Cell => ({
+              row: rowIndex,
+              col: cellIndex,
+              value: cell != 0 ? cell : null,
+              given: cell != 0,
+              try: false,
+              ref: null
+            })
+        ))
+  }
+}
+
+const sudoku = ref<Sudoku>(
+    initSudoku(getRandomSudoku())
 );
 
 const setCellValue = (value: string, row: number, col: number) => {
   const numberValue = value.replace(/[^1-9]/g, "");
 
-  const cell = cells.value[row][col];
+  const cell = sudoku.value.cells[row][col];
   if (cell.given) return;
   cell.value = numberValue ? Number(numberValue) : null;
 };
@@ -51,44 +57,44 @@ const setCellValue = (value: string, row: number, col: number) => {
 
 <template>
   <h1 style="margin-top: 20%">Sudoku</h1>
-    <div class="sudoku-row">
-      <div
-          v-for="(row, rowIndex) in cells"
-          :key="rowIndex"
-          :class="
+  <div class="sudoku-row">
+    <div
+        v-for="(row, rowIndex) in sudoku.cells"
+        :key="rowIndex"
+        :class="
           { 'border-top-bold': rowIndex % 3 === 0 && rowIndex !== 0}"
-      >
-        <div class="sudoku-col">
-          <div
-              v-for="(cell, colIndex) in row"
-              :key="colIndex"
-              class="sudoku-cell"
-              @keydown="switchFocusCell($event, cell.row, cell.col)"
-              tabindex="0"
-              :class="[
+    >
+      <div class="sudoku-col">
+        <div
+            v-for="(cell, colIndex) in row"
+            :key="colIndex"
+            :class="[
               { 'is-given': cell.given },
               { 'border-left-bold': colIndex % 3 === 0 && colIndex !== 0 },
             ]"
-          >
+            class="sudoku-cell"
+            tabindex="0"
+            @keydown="switchFocusCell($event, cell.row, cell.col)"
+        >
         <span>
           <v-text-field
               :ref="element => cell.ref = element"
               :model-value="cell.value"
-              @update:model-value="setCellValue($event, cell.row, cell.col)"
-              type="text"
-              maxlength="1"
+              class="sudoku-input"
               density="compact"
               hide-details
+              maxlength="1"
+              type="text"
               variant="plain"
-              class="sudoku-input"
+              @update:model-value="setCellValue($event, cell.row, cell.col)"
           ></v-text-field>
         </span>
-          </div>
         </div>
-
       </div>
 
     </div>
+
+  </div>
 </template>
 
 <style scoped>
@@ -119,12 +125,15 @@ const setCellValue = (value: string, row: number, col: number) => {
 .border-top-bold {
   border-top: 2px solid darkgrey;
 }
+
 .border-left-bold {
   border-left: 2px solid darkgrey;
 }
+
 .border-right-bold {
   border-right: 2px solid darkgrey;
 }
+
 .border-bottom-bold {
   border-bottom: 2px solid darkgrey;
 }

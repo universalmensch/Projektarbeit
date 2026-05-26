@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import Sudoku from './components/Sudoku.vue'
+import SudokuTab from './components/SudokuTab.vue'
 </script>
 
 <template>
-  <Sudoku />
+  <SudokuTab />
 </template>

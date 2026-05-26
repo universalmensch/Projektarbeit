@@ -3,5 +3,6 @@ export type Cell = {
     col: number;
     value: number | null;
     given: boolean;
+    try: boolean;
     ref: any | null;
 };
