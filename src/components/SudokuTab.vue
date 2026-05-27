@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import {ref} from 'vue';
-import type {Cell} from "../types/Cell.ts";
 import {VTextField} from "vuetify/components";
-import type {NumericSudoku, Sudoku} from "../types/Sudoku.ts";
-import {getRandomSudoku} from "./SudokuManager.ts";
+import type {Sudoku} from "../types/Sudoku.ts";
+
+const props = defineProps<{
+  sudoku: Sudoku;
+}>();
 
 const switchFocusCell = (e: KeyboardEvent, row: number, col: number) => {
   switch (e.key) {
@@ -24,32 +25,14 @@ const switchFocusCell = (e: KeyboardEvent, row: number, col: number) => {
   }
 
   e.preventDefault();
-  sudoku.value.cells[row][col].ref?.focus();
+  props.sudoku.cells[row][col].ref?.focus();
 };
 
-const initSudoku = (newSudoku: NumericSudoku): Sudoku => {
-  return {
-    cells: newSudoku.cells.map((row, rowIndex) =>
-        row.map((cell, cellIndex): Cell => ({
-              row: rowIndex,
-              col: cellIndex,
-              value: cell != 0 ? cell : null,
-              given: cell != 0,
-              try: false,
-              ref: null
-            })
-        ))
-  }
-}
-
-const sudoku = ref<Sudoku>(
-    initSudoku(getRandomSudoku())
-);
 
 const setCellValue = (value: string, row: number, col: number) => {
   const numberValue = value.replace(/[^1-9]/g, "");
 
-  const cell = sudoku.value.cells[row][col];
+  const cell = props.sudoku.cells[row][col];
   if (cell.given) return;
   cell.value = numberValue ? Number(numberValue) : null;
 };

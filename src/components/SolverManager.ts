@@ -1,11 +1,11 @@
 import type {Solver} from "../types/Solver.ts";
 import {DancingLinksSolver} from "../solver/DancingLinks.ts";
 import {ConstraintSolver} from "../solver/ContrainPropagation.ts";
-import {BacktrackingSolver} from "../solver/BackTracking.ts";
+import {Backtracking} from "../solver/BackTracking.ts";
 import type {Sudoku} from "../types/Sudoku.ts";
 
 export const solvers: Solver[] = [
-    BacktrackingSolver,
+    new Backtracking(),
     ConstraintSolver,
     DancingLinksSolver
 ];
@@ -22,23 +22,14 @@ export class SolverManager {
         this.board = this.sudokuToSolverBoard(sudoku);
     }
 
-    solve() {
+    solveSteps(steps?: number){
         if (this.solver === null)
             throw new Error("solver initialization is missing");
 
         if (this.board === null)
             throw new Error("board initialization is missing");
 
-        return this.solver.solve(this.board);
-    }
-
-    solveSteps(){
-        if (this.solver === null)
-            throw new Error("solver initialization is missing");
-
-        if (this.board === null)
-            throw new Error("board initialization is missing");
-
+        return this.solver.solveSteps(this.board, steps)
     }
 
     sudokuToSolverBoard(sudoku: Sudoku): number[][] {
