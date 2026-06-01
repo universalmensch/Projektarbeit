@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import {VTextField} from "vuetify/components";
 import type {Sudoku} from "../types/Sudoku.ts";
+import type {Cell} from "../types/Cell.ts";
 
 const props = defineProps<{
   sudoku: Sudoku;
@@ -11,15 +12,19 @@ const switchFocusCell = (e: KeyboardEvent, row: number, col: number) => {
     case "ArrowUp":
       if (row > 0) row -= 1;
       break;
+
     case "ArrowDown":
       if (row < 8) row += 1;
       break;
+
     case "ArrowLeft":
       if (col > 0) col -= 1;
       break;
+
     case "ArrowRight":
       if (col < 8) col += 1;
       break;
+
     default:
       return;
   }
@@ -28,6 +33,25 @@ const switchFocusCell = (e: KeyboardEvent, row: number, col: number) => {
   props.sudoku.cells[row][col].ref?.focus();
 };
 
+const hasError = (cell: Cell): boolean => {
+  if (cell.value === null) return false;
+
+  for (let i = 0; i < 9; i++) {
+    if (i !== cell.column && props.sudoku.cells[cell.row][i].value === cell.value) return true;
+    if (i !== cell.row && props.sudoku.cells[i][cell.column].value === cell.value) return true;
+  }
+
+  const bottomRow = Math.floor(cell.row / 3) * 3;
+  const bottomColumn = Math.floor(cell.column / 3) * 3;
+
+  for (let row = bottomRow; row < bottomRow + 3; row++) {
+    for (let column = bottomColumn; column < bottomColumn + 3; column++) {
+      if (row !== cell.row && column !== cell.column && props.sudoku.cells[row][column].value === cell.value) return true;
+    }
+  }
+
+  return false;
+}
 
 const setCellValue = (value: string, row: number, col: number) => {
   const numberValue = value.replace(/[^1-9]/g, "");
@@ -36,6 +60,7 @@ const setCellValue = (value: string, row: number, col: number) => {
   if (cell.given) return;
   cell.value = numberValue ? Number(numberValue) : null;
 };
+
 </script>
 
 <template>
@@ -53,11 +78,13 @@ const setCellValue = (value: string, row: number, col: number) => {
             :key="colIndex"
             :class="[
               { 'is-given': cell.given },
+              { 'is-try': cell.try },
+              { 'has-error': hasError(cell) },
               { 'border-left-bold': colIndex % 3 === 0 && colIndex !== 0 },
             ]"
             class="sudoku-cell"
             tabindex="0"
-            @keydown="switchFocusCell($event, cell.row, cell.col)"
+            @keydown="switchFocusCell($event, cell.row, cell.column)"
         >
         <span>
           <v-text-field
@@ -69,7 +96,7 @@ const setCellValue = (value: string, row: number, col: number) => {
               maxlength="1"
               type="text"
               variant="plain"
-              @update:model-value="setCellValue($event, cell.row, cell.col)"
+              @update:model-value="setCellValue($event, cell.row, cell.column)"
           ></v-text-field>
         </span>
         </div>
@@ -105,6 +132,14 @@ const setCellValue = (value: string, row: number, col: number) => {
 
 .sudoku-cell.is-given {
   color: black;
+}
+
+.sudoku-cell.is-try {
+  color: orange;
+}
+
+.sudoku-cell.has-error {
+  background-color: lightpink;
 }
 
 .border-top-bold {

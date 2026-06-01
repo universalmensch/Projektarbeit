@@ -1,19 +1,19 @@
 import type {Solver} from "../types/Solver.ts";
 import {isValid, maxSteps} from "../components/Utils.ts";
 import {type SolverEvent, SolverEventTypes} from "../types/SolverEvent.ts";
-import {eventBus} from "../components/EventBus.ts";
 
 export class Backtracking implements Solver {
     public name = "Backtracking";
 
-    solveSteps(board: number[][], steps = maxSteps): void {
+    solveSteps(board: number[][], steps = maxSteps): SolverEvent[] {
         const clone = board.map(r => [...r]);
-        this.solve(clone, steps);
+        return this.solve(clone, steps);
     }
 
-    solve(board: number[][], steps: number): void {
-        const empties: [number, number][] = this.getEmpties(board);
+    solve(board: number[][], steps: number): SolverEvent[] {
+        let result: SolverEvent[] = [];
 
+        const empties: [number, number][] = this.getEmpties(board);
         const nextNumberValue = new Array(empties.length).fill(1);
 
         let index = 0;
@@ -24,26 +24,20 @@ export class Backtracking implements Solver {
 
             for (let numberTry: number = nextNumberValue[index]; numberTry <= 9; numberTry++) {
                 if (isValid(board, row, column, numberTry)) {
-                    board[row][column] = numberTry;
 
-                   // emit?.({type: SolverEventTypes.SET, row, col: column, value: numberTry});
-                    nextNumberValue[index] = numberTry + 1;
-                    placed = true;
-                    steps -= 1;
-                    console.log(steps);
-                    console.log(empties[index]);
-                    console.log(numberTry);
-
-                    const event: SolverEvent = {
-                        type: SolverEventTypes.SET,
+                    result.push({
+                        type: SolverEventTypes.TRY,
                         row: row,
                         column: column,
                         value: numberTry
-                    }
+                    })
 
-                    eventBus.emit(event);
+                    board[row][column] = numberTry;
+                    nextNumberValue[index] = numberTry + 1;
+                    placed = true;
+                    steps -= 1;
 
-                    if (steps <= 0) return;
+                    if (steps <= 0) return result;
 
                     index++;
                     break;
@@ -51,10 +45,15 @@ export class Backtracking implements Solver {
             }
 
             if (!placed) {
-                nextNumberValue[index] = 1;
                 if (board[row][column] !== 0) {
-                   // emit?.({type: SolverEventTypes.UNSET, row, col: column, value: board[row][column]});
+                    result.push({
+                        type: SolverEventTypes.UNSET,
+                        row: row,
+                        column: column
+                    })
                 }
+
+                nextNumberValue[index] = 1;
                 board[row][column] = 0;
                 steps += 1;
 
@@ -62,22 +61,11 @@ export class Backtracking implements Solver {
             }
         }
 
-        if (index === empties.length) {
-           // emit?.({type: SolverEventTypes.DONE});
-        }
+        result.push({
+            type: SolverEventTypes.DONE
+        })
 
-        console.log(board)
-
-    }
-
-    private getEmpties(board: number[][]) {
-        let empties: [number, number][] = [];
-        board.forEach((row, rowIndex) =>
-            row.forEach((column, columnIndex) => {
-                if (column === 0)
-                    empties.push([rowIndex, columnIndex])
-            }));
-        return empties;
+        return result;
     }
 
     findEmpty(board: number[][]) {
@@ -89,5 +77,13 @@ export class Backtracking implements Solver {
         return null;
     }
 
-
+    private getEmpties(board: number[][]) {
+        let empties: [number, number][] = [];
+        board.forEach((row, rowIndex) =>
+            row.forEach((column, columnIndex) => {
+                if (column === 0)
+                    empties.push([rowIndex, columnIndex])
+            }));
+        return empties;
+    }
 }
