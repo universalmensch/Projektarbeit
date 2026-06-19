@@ -79,6 +79,7 @@ const setCellValue = (value: string, row: number, col: number) => {
             :class="[
               { 'is-given': cell.given },
               { 'is-try': cell.try },
+              { 'is-check': cell.check },
               { 'has-error': hasError(cell) },
               { 'border-left-bold': colIndex % 3 === 0 && colIndex !== 0 },
             ]"
@@ -136,6 +137,10 @@ const setCellValue = (value: string, row: number, col: number) => {
 
 .sudoku-cell.is-try {
   color: orange;
+}
+
+.sudoku-cell.is-check {
+  background-color: lightgreen;
 }
 
 .sudoku-cell.has-error {

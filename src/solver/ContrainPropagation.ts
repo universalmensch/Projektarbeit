@@ -61,12 +61,6 @@ export class ConstraintSolver implements Solver {
     ) {
         if (steps <= 0) return;
 
-        solverEvents.push({
-            type: SolverEventTypes.CHECK,
-            row: row,
-            column: column,
-        })
-
         this.checkRows(candidates, row, board, value, solverEvents, steps);
 
         this.checkColumns(candidates, board, column, value, solverEvents, steps);
@@ -160,27 +154,60 @@ export class ConstraintSolver implements Solver {
 
         for (let currentRow = bottomRow; currentRow < bottomRow + 3; currentRow++) {
             for (let currentColumn = bottomColumn; currentColumn < bottomColumn + 3; currentColumn++) {
-                this.deleteValue(candidates, board, currentRow, currentColumn, value, solverEvents, steps);
                 cells.push([currentRow, currentColumn]);
             }
         }
 
+        solverEvents.push({
+            type: SolverEventTypes.CHECK_CELLS,
+            cells: cells,
+        })
+
+        for (const [cellRow, cellColumn] of cells) {
+            this.deleteValue(candidates, board, cellRow, cellColumn, value, solverEvents, steps);
+        }
+
         this.checkOnlyPlaceForNumber(board, candidates, cells, solverEvents, steps);
+
+        solverEvents.push({
+            type: SolverEventTypes.UNCHECK_CELLS,
+            cells: cells,
+        })
     }
 
     private checkColumns(candidates: Set<number>[][], board: number[][], column: number, value: number, solverEvents: SolverEvent[], steps: number) {
+        solverEvents.push({
+            type: SolverEventTypes.CHECK_CELLS,
+            cells: this.columnCells(column),
+        })
+
         candidates.forEach((_row, index) => {
             this.deleteValue(candidates, board, index, column, value, solverEvents, steps);
         });
 
         this.checkOnlyPlaceForNumber(board, candidates, this.columnCells(column), solverEvents, steps);
+
+        solverEvents.push({
+            type: SolverEventTypes.UNCHECK_CELLS,
+            cells: this.columnCells(column),
+        })
     }
 
     private checkRows(candidates: Set<number>[][], row: number, board: number[][], value: number, solverEvents: SolverEvent[], steps: number) {
+        solverEvents.push({
+            type: SolverEventTypes.CHECK_CELLS,
+            cells: this.rowCells(row),
+        })
+
         candidates[row].forEach((_currentCandidates, index) => {
             this.deleteValue(candidates, board, row, index, value, solverEvents, steps);
         })
 
         this.checkOnlyPlaceForNumber(board, candidates, this.rowCells(row), solverEvents, steps);
+
+        solverEvents.push({
+            type: SolverEventTypes.UNCHECK_CELLS,
+            cells: this.columnCells(row),
+        })
     }
 }
