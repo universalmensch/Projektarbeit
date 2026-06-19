@@ -6,7 +6,7 @@ import type {Sudoku} from "../types/Sudoku.ts";
 
 export const solvers: Solver[] = [
     new Backtracking(),
-    ConstraintSolver,
+    new ConstraintSolver(),
     DancingLinksSolver
 ];
 
@@ -22,7 +22,7 @@ export class SolverManager {
         this.board = this.sudokuToSolverBoard(sudoku);
     }
 
-    solveSteps(steps?: number){
+    solveSteps(steps?: number) {
         if (this.solver === null)
             throw new Error("solver initialization is missing");
 
