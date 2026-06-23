@@ -7,7 +7,7 @@ import type {Sudoku} from "../types/Sudoku.ts";
 export const solvers: Solver[] = [
     new Backtracking(),
     new ConstraintSolver(),
-    DancingLinksSolver
+    new DancingLinksSolver(),
 ];
 
 export class SolverManager {
