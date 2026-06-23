@@ -1,5 +1,3 @@
-
-
 export function isValid(board: number[][], row: number, col: number, num: number): boolean {
     for (let i = 0; i < 9; i++) {
         if (board[row][i] === num) return false;
@@ -19,3 +17,13 @@ export function isValid(board: number[][], row: number, col: number, num: number
 }
 
 export const maxSteps = 81;
+
+
+export function hasEmpties(board: number[][]) {
+    for (let row = 0; row < 9; row++) {
+        for (let column = 0; column < 9; column++) {
+            if (board[row][column] === 0) return true;
+        }
+    }
+    return false;
+}

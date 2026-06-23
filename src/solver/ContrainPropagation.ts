@@ -1,6 +1,6 @@
 import type {Solver} from "../types/Solver.ts";
 import {type SolverEvent, SolverEventTypes} from "../types/SolverEvent.ts";
-import {maxSteps} from "../components/Utils.ts";
+import {hasEmpties, maxSteps} from "../components/Utils.ts";
 
 export class ConstraintSolver implements Solver {
     public name = "Constraint Propagation";
@@ -60,6 +60,8 @@ export class ConstraintSolver implements Solver {
         steps: number
     ) {
         if (steps <= 0) return;
+
+        if (!hasEmpties(board)) return;
 
         this.checkRows(candidates, row, board, value, solverEvents, steps);
 
