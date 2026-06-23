@@ -5,12 +5,12 @@ import {type SolverEvent, SolverEventTypes} from "../types/SolverEvent.ts";
 export class Backtracking implements Solver {
     public name = "Backtracking";
 
-    solveSteps(board: number[][], steps = maxSteps): SolverEvent[] {
+    public solveSteps(board: number[][], steps = maxSteps): SolverEvent[] {
         const clone = board.map(r => [...r]);
         return this.solve(clone, steps);
     }
 
-    solve(board: number[][], steps: number): SolverEvent[] {
+    private solve(board: number[][], steps: number): SolverEvent[] {
         let result: SolverEvent[] = [];
 
         const empties: [number, number][] = this.getEmpties(board);
@@ -66,15 +66,6 @@ export class Backtracking implements Solver {
         })
 
         return result;
-    }
-
-    findEmpty(board: number[][]) {
-        for (let row = 0; row < 9; row++) {
-            for (let column = 0; column < 9; column++) {
-                if (board[row][column] === 0) return [row, column];
-            }
-        }
-        return null;
     }
 
     private getEmpties(board: number[][]) {

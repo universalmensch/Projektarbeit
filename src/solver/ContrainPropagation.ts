@@ -5,18 +5,18 @@ import {maxSteps} from "../components/Utils.ts";
 export class ConstraintSolver implements Solver {
     public name = "Constraint Propagation";
 
-    solveSteps(board: number[][], steps = maxSteps): SolverEvent[] {
+    public solveSteps(board: number[][], steps = maxSteps): SolverEvent[] {
         const clone = board.map(r => [...r]);
         return this.solve(clone, steps);
     }
 
-    solve(board: number[][], steps: number): SolverEvent[] {
+    private solve(board: number[][], steps: number): SolverEvent[] {
         const candidates = this.initCandidates(board);
 
         return this.propagate(board, steps, candidates);
     }
 
-    initCandidates(board: number[][]): Set<number>[][] {
+    private initCandidates(board: number[][]): Set<number>[][] {
         const candidates: Set<number>[][] = [];
         for (let row = 0; row < 9; row++) {
             candidates[row] = [];
@@ -32,7 +32,7 @@ export class ConstraintSolver implements Solver {
         return candidates;
     }
 
-    propagate(board: number[][], steps: number, candidates: Set<number>[][]): SolverEvent[] {
+    private propagate(board: number[][], steps: number, candidates: Set<number>[][]): SolverEvent[] {
         let solverEvents: SolverEvent[] = [];
 
         for (let row = 0; row < 9; row++) {
@@ -50,7 +50,7 @@ export class ConstraintSolver implements Solver {
         return solverEvents;
     }
 
-    eliminate(
+    private eliminate(
         row: number,
         column: number,
         value: number,
@@ -68,7 +68,7 @@ export class ConstraintSolver implements Solver {
         this.checkBlock(row, column, candidates, board, value, solverEvents, steps);
     }
 
-    deleteValue(candidates: Set<number>[][], board: number[][], row: number, column: number, value: number, solverEvents: SolverEvent[], steps: number) {
+    private deleteValue(candidates: Set<number>[][], board: number[][], row: number, column: number, value: number, solverEvents: SolverEvent[], steps: number) {
         const currentCandidates = candidates[row][column];
         if (currentCandidates.delete(value)) {
             if (currentCandidates.size === 1) {
@@ -91,7 +91,7 @@ export class ConstraintSolver implements Solver {
         }
     }
 
-    checkOnlyPlaceForNumber(
+    private checkOnlyPlaceForNumber(
         board: number[][],
         candidates: Set<number>[][],
         cells: [number, number][],
@@ -139,11 +139,11 @@ export class ConstraintSolver implements Solver {
         }
     }
 
-    rowCells(row: number): [number, number][] {
+    private rowCells(row: number): [number, number][] {
         return Array.from({length: 9}, (_, column) => [row, column]);
     }
 
-    columnCells(column: number): [number, number][] {
+    private columnCells(column: number): [number, number][] {
         return Array.from({length: 9}, (_, row) => [row, column]);
     }
 
