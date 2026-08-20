@@ -25,18 +25,30 @@ const initSudoku = (newSudoku: NumericSudoku): Sudoku => {
   }
 }
 
-const sudoku = ref<Sudoku>(
-    initSudoku(getRandomSudoku())
-);
+let selectedSudoku: NumericSudoku = getRandomSudoku();
+let sudoku = ref<Sudoku>(initSudoku(selectedSudoku));
+
+const resetSudoku = () => {
+  sudoku.value = initSudoku(selectedSudoku);
+  currentIndex = 0;
+  isPlaying = false;
+}
+
 
 let isPlaying = false;
 let playSpeed = 50;
 let currentIndex = 0;
 
-async function playSolverEvents(events: SolverEvent[]) {
+function startSolverEvents(events: SolverEvent[]) {
   if (isPlaying) return;
+
+  currentIndex = 0;
   isPlaying = true;
 
+  playSolverEvents(events);
+}
+
+async function playSolverEvents(events: SolverEvent[]) {
   while (currentIndex < events.length && isPlaying) {
     const event = events[currentIndex];
     handleSolverEvent(event);
@@ -53,6 +65,9 @@ function pause() {
 }
 
 function resume(events: SolverEvent[]) {
+  if (isPlaying) return;
+
+  isPlaying = true;
   playSolverEvents(events);
 }
 
@@ -138,10 +153,10 @@ function handleSolverEvent(solverEvent: SolverEvent) {
 <template>
   <v-row>
     <v-col>
-      <SolverTab :sudoku="sudoku" @solverEvents="playSolverEvents($event)"/>
+      <SolverTab :sudoku="sudoku" @solverEvents="startSolverEvents($event)"/>
     </v-col>
     <v-col>
-      <SudokuTab :sudoku="sudoku"></SudokuTab>
+      <SudokuTab :sudoku="sudoku" @resetBoard="resetSudoku"/>
     </v-col>
     <v-col>
       <SudokuSelectionTab></SudokuSelectionTab>

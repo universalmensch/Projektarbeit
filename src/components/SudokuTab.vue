@@ -61,6 +61,15 @@ const setCellValue = (value: string, row: number, col: number) => {
   cell.value = numberValue ? Number(numberValue) : null;
 };
 
+const emit = defineEmits<{
+  (event: 'resetBoard'): void;
+}>()
+
+
+const resetBoard = () => {
+  emit('resetBoard')
+}
+
 </script>
 
 <template>
@@ -106,6 +115,7 @@ const setCellValue = (value: string, row: number, col: number) => {
     </div>
 
   </div>
+  <button @click="resetBoard">Reset Board</button>
 </template>
 
 <style scoped>
