@@ -31,48 +31,91 @@ let sudoku = ref<Sudoku>(initSudoku(selectedSudoku));
 const resetSudoku = () => {
   sudoku.value = initSudoku(selectedSudoku);
   currentIndex = 0;
-  isPlaying = false;
+  currentEvents = [];
+  isPlaying.value = false;
 }
 
+const SPEED_SLOW = 200;
+const SPEED_NORMAL = 80;
+const SPEED_FAST = 15;
 
-let isPlaying = false;
-let playSpeed = 50;
+let isPlaying = ref(false);
+let playSpeed = SPEED_SLOW;
 let currentIndex = 0;
+let currentEvents: SolverEvent[] = [];
 
 function startSolverEvents(events: SolverEvent[]) {
-  if (isPlaying) return;
+  if (isPlaying.value) return;
 
+  currentEvents = events;
   currentIndex = 0;
-  isPlaying = true;
+  isPlaying.value = true;
 
-  playSolverEvents(events);
+  playSolverEvents();
 }
 
-async function playSolverEvents(events: SolverEvent[]) {
-  while (currentIndex < events.length && isPlaying) {
-    const event = events[currentIndex];
+async function playSolverEvents() {
+  while (currentIndex < currentEvents.length && isPlaying.value) {
+    const event = currentEvents[currentIndex];
+
     handleSolverEvent(event);
+    currentIndex++;
 
     await new Promise(resolve => setTimeout(resolve, playSpeed));
-    currentIndex++;
   }
 
-  isPlaying = false;
+  isPlaying.value = false;
+}
+
+function togglePlaying() {
+  if (isPlaying.value) {
+    pause();
+  } else {
+    resume();
+  }
 }
 
 function pause() {
-  isPlaying = false;
+  isPlaying.value = false;
 }
 
-function resume(events: SolverEvent[]) {
-  if (isPlaying) return;
+function resume() {
+  if (isPlaying.value) return;
+  if (currentIndex >= currentEvents.length) return;
 
-  isPlaying = true;
-  playSolverEvents(events);
+  isPlaying.value = true;
+  playSolverEvents();
 }
 
 function setSpeed(ms: number) {
   playSpeed = ms;
+}
+
+function nextEvent() {
+  if (isPlaying.value) return;
+  if (currentIndex >= currentEvents.length) return;
+
+  const event = currentEvents[currentIndex];
+
+  handleSolverEvent(event);
+  currentIndex++;
+}
+
+function previousEvent() {
+  if (isPlaying.value) return;
+  if (currentIndex <= 0) return;
+
+  goToEvent(currentIndex - 1);
+}
+
+function goToEvent(index: number) {
+  sudoku.value = initSudoku(selectedSudoku);
+
+  for (let i = 0; i < index; i++) {
+    handleSolverEvent(currentEvents[i]);
+  }
+
+  currentIndex = index;
 }
 
 function handleSolverEvent(solverEvent: SolverEvent) {
@@ -156,7 +199,40 @@ function handleSolverEvent(solverEvent: SolverEvent) {
       <SolverTab :sudoku="sudoku" @solverEvents="startSolverEvents($event)"/>
     </v-col>
     <v-col>
-      <SudokuTab :sudoku="sudoku" @resetBoard="resetSudoku"/>
+      <SudokuTab :sudoku="sudoku"/>
+      <div class="solver-controls">
+        <button @click="resetSudoku">Reset Board</button>
+
+        <button
+            :disabled="isPlaying"
+            @click="previousEvent"
+        >
+          Previous
+        </button>
+
+        <button @click="togglePlaying">
+          {{ isPlaying ? '⏸' : "▶" }}
+        </button>
+
+        <button
+            :disabled="isPlaying"
+            @click="nextEvent"
+        >
+          Next
+        </button>
+
+        <button @click="setSpeed(SPEED_SLOW)">
+          >
+        </button>
+
+        <button @click="setSpeed(SPEED_NORMAL)">
+          >>
+        </button>
+
+        <button @click="setSpeed(SPEED_FAST)">
+          >>>
+        </button>
+      </div>
     </v-col>
     <v-col>
       <SudokuSelectionTab></SudokuSelectionTab>
