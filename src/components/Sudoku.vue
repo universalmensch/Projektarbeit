@@ -97,6 +97,13 @@ function handleSolverEvent(solverEvent: SolverEvent) {
       }
       break;
 
+    case SolverEventTypes.UNCHECK:
+      sudoku.value.cells[solverEvent.row][solverEvent.column] = {
+        ...sudoku.value.cells[solverEvent.row][solverEvent.column],
+        check: false
+      }
+      break;
+
     case SolverEventTypes.CHECK_CELLS:
       for (const [row, column] of solverEvent.cells) {
         sudoku.value.cells[row][column] = {

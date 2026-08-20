@@ -78,8 +78,6 @@ export class DancingLinksSolver implements Solver {
         last.right = root;
         root.left = last;
 
-
-        columns.push(root);
         this.fillConstraintColumns(board, columns);
 
         return root;
@@ -146,6 +144,7 @@ export class DancingLinksSolver implements Solver {
         let constraintColumn = this.findSmallestColumn(header);
 
         this.cover(constraintColumn);
+        this.addConstraintEvent(solverEvents, constraintColumn.index, true);
 
         for (let valueNode = constraintColumn.down; valueNode !== constraintColumn; valueNode = valueNode.down) {
             if (board[valueNode.row][valueNode.column] === 0) {
@@ -180,7 +179,89 @@ export class DancingLinksSolver implements Solver {
         }
 
         this.uncover(constraintColumn);
+        this.addConstraintEvent(solverEvents, constraintColumn.index, false);
         return false;
+    }
+
+    private addConstraintEvent(solverEvents: SolverEvent[], index: number, check: boolean) {
+        const type = Math.floor(index / 81);
+        const offset = index % 81;
+
+        switch (type) {
+            // cell
+            case 0: {
+                const row = Math.floor(offset / 9);
+                const column = offset % 9;
+
+                solverEvents.push({
+                    type: check ? SolverEventTypes.CHECK : SolverEventTypes.UNCHECK,
+                    row,
+                    column,
+                });
+                break;
+            }
+
+            // row
+            case 1: {
+                const row = Math.floor(offset / 9);
+
+                const cells: [number, number][] = [];
+                for (let c = 0; c < 9; c++) {
+                    cells.push([row, c]);
+                }
+
+                solverEvents.push({
+                    type: check
+                        ? SolverEventTypes.CHECK_CELLS
+                        : SolverEventTypes.UNCHECK_CELLS,
+                    cells,
+                });
+                break;
+            }
+
+            // column
+            case 2: {
+                const column = Math.floor(offset / 9);
+
+                const cells: [number, number][] = [];
+                for (let r = 0; r < 9; r++) {
+                    cells.push([r, column]);
+                }
+
+                solverEvents.push({
+                    type: check
+                        ? SolverEventTypes.CHECK_CELLS
+                        : SolverEventTypes.UNCHECK_CELLS,
+                    cells,
+                });
+                break;
+            }
+
+            // block
+            case 3: {
+                const block = Math.floor(offset / 9);
+
+                const blockRow = Math.floor(block / 3) * 3;
+                const blockCol = (block % 3) * 3;
+
+                const cells: [number, number][] = [];
+                for (let r = 0; r < 3; r++) {
+                    for (let c = 0; c < 3; c++) {
+                        cells.push([blockRow + r, blockCol + c]);
+                    }
+                }
+
+                solverEvents.push({
+                    type: check
+                        ? SolverEventTypes.CHECK_CELLS
+                        : SolverEventTypes.UNCHECK_CELLS,
+                    cells,
+                });
+                break;
+            }
+            default:
+                return;
+        }
     }
 
     private cover(constraintColumn: ConstraintColumn) {
