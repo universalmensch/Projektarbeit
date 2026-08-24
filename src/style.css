@@ -1,6 +1,14 @@
 body {
-  background: white;
-  display: flex;
-  color: black;
-  justify-content: center;
+    background: white;
+    display: flex;
+    color: black;
+    justify-content: center;
+}
+
+button {
+    width: 100px;
+}
+
+select {
+    width: 200px;
 }

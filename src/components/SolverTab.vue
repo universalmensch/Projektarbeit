@@ -25,7 +25,7 @@ const start = () => {
 </script>
 
 <template>
-  <p>select algorithm</p>
+  <h1 style="margin-top: 20%">select algorithm</h1>
   <select v-model="selectedSolver">
     <option
         v-for="solver in solvers"
@@ -35,7 +35,7 @@ const start = () => {
       {{ solver.name }}
     </option>
   </select>
-
+  <br>
   <button @click="start">Start Solver</button>
 </template>
 
