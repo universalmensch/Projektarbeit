@@ -5,5 +5,6 @@ export type Sudoku = {
 };
 
 export type NumericSudoku = {
+    name: string;
     cells: number[][];
 }

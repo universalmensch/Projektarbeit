@@ -1,11 +1,22 @@
+import {sudokus} from "./Puzzle.ts";
 import type {NumericSudoku} from "../types/Sudoku.ts";
-import {sudoku1} from "./Puzzle.ts";
 
-export const sudokus: NumericSudoku[] =
-   [ sudoku1 ]
+let newSudokus: NumericSudoku[] = [];
 
+export function addSudoku(name: string, newSudoku: number[]) {
+    const cells: number[][] = [];
+
+    for (let i = 0; i < 81; i += 9) {
+        cells.push(newSudoku.slice(i, i + 9));
+    }
+
+    newSudokus.push({
+        name, cells
+    } as NumericSudoku)
+}
 
 export function getRandomSudoku() {
-    const index = Math.floor(Math.random() * sudokus.length);
-    return sudokus[index];
+    const allSudokus = [...sudokus, ...newSudokus]
+    const index = Math.floor(Math.random() * (allSudokus.length));
+    return allSudokus[index];
 }
