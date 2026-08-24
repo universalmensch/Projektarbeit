@@ -20,3 +20,7 @@ export function getRandomSudoku() {
     const index = Math.floor(Math.random() * (allSudokus.length));
     return allSudokus[index];
 }
+
+export function getSudokus() {
+    return [...sudokus, ...newSudokus]
+}

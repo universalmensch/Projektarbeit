@@ -5,7 +5,7 @@ import SudokuSelectionTab from "./SudokuSelectionTab.vue";
 import type {NumericSudoku, Sudoku} from "../types/Sudoku.ts";
 import type {Cell} from "../types/Cell.ts";
 import {ref} from "vue";
-import {getRandomSudoku} from "./SudokuManager.ts";
+import {getSudokus} from "./SudokuManager.ts";
 import {type SolverEvent, SolverEventTypes} from "../types/SolverEvent.ts";
 
 
@@ -25,11 +25,16 @@ const initSudoku = (newSudoku: NumericSudoku): Sudoku => {
   }
 }
 
-let selectedSudoku: NumericSudoku = getRandomSudoku();
+let selectedSudoku: NumericSudoku = getSudokus()[0];
 let sudoku = ref<Sudoku>(initSudoku(selectedSudoku));
 
 const resetSudoku = () => {
-  sudoku.value = initSudoku(selectedSudoku);
+  setSudoku(selectedSudoku);
+}
+
+const setSudoku = (newSudoku: NumericSudoku) => {
+  selectedSudoku = newSudoku;
+  sudoku.value = initSudoku(newSudoku);
   currentIndex = 0;
   currentEvents = [];
   isPlaying.value = false;
@@ -235,7 +240,7 @@ function handleSolverEvent(solverEvent: SolverEvent) {
       </div>
     </v-col>
     <v-col>
-      <SudokuSelectionTab></SudokuSelectionTab>
+      <SudokuSelectionTab @sudokuSelected="setSudoku($event)"/>
     </v-col>
   </v-row>
 </template>
