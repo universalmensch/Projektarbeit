@@ -200,19 +200,14 @@ function handleSolverEvent(solverEvent: SolverEvent) {
 
 <template>
   <v-row>
-    <v-col>
-      <SolverTab :sudoku="sudoku" @solverEvents="startSolverEvents($event)"/>
-    </v-col>
-    <v-col>
+    <v-col style="margin-right: 2%">
       <SudokuTab :sudoku="sudoku"/>
       <div class="solver-controls">
-        <button @click="resetSudoku">Reset Board</button>
-
         <button
             :disabled="isPlaying"
             @click="previousEvent"
         >
-          Previous
+          previous
         </button>
 
         <button @click="togglePlaying">
@@ -223,9 +218,9 @@ function handleSolverEvent(solverEvent: SolverEvent) {
             :disabled="isPlaying"
             @click="nextEvent"
         >
-          Next
+          next
         </button>
-
+        <br>
         <button @click="setSpeed(SPEED_SLOW)">
           >
         </button>
@@ -240,11 +235,14 @@ function handleSolverEvent(solverEvent: SolverEvent) {
       </div>
     </v-col>
     <v-col>
-      <SudokuSelectionTab @sudokuSelected="setSudoku($event)"/>
+      <SolverTab :sudoku="sudoku" @solverEvents="startSolverEvents($event)"/>
+      <SudokuSelectionTab @resetSudoku="resetSudoku" @sudokuSelected="setSudoku($event)"/>
     </v-col>
   </v-row>
 </template>
 
 <style scoped>
-
+.solver-controls {
+  text-align: center;
+}
 </style>

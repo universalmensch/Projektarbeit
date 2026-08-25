@@ -5,6 +5,7 @@ import {ref} from "vue";
 
 const emit = defineEmits<{
   (event: 'sudokuSelected', value: NumericSudoku): void
+  (event: 'resetSudoku'): void
 }>()
 
 const selectSudoku = (sudoku: NumericSudoku) => {
@@ -50,10 +51,15 @@ const selectRandom = () => {
   selectedSudoku.value = getRandomSudoku()
   emit('sudokuSelected', selectedSudoku.value);
 }
+
+const resetSudoku = () => {
+  emit('resetSudoku')
+}
+
 </script>
 
 <template>
-  <h1 style="margin-top: 20%">select sudoku</h1>
+  <h1 style="margin-top: 10%">select sudoku</h1>
   <select v-model="selectedSudoku" @change="selectSudoku(selectedSudoku)">
     <option
         v-for="sudoku in sudokus"
@@ -65,7 +71,12 @@ const selectRandom = () => {
   </select>
   <br>
   <button @click="selectRandom">select random</button>
-  <h1 style="margin-top: 20%"><b>add sudoku</b></h1>
+  <br>
+  <button @click="resetSudoku">reset sudoku</button>
+  <!--
+  code to add a sudoku, does function, adding a sudoku is a bit cursed
+
+  <h1 style="margin-top: 10%"><b>add sudoku</b></h1>
   <label for="sudokuName">name: </label>
   <br>
   <input
@@ -88,6 +99,7 @@ const selectRandom = () => {
   <br>
   <button @click="addNewSudoku">add</button>
   {{ error }}
+  -->
 </template>
 
 <style scoped>

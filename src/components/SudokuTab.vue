@@ -63,7 +63,7 @@ const setCellValue = (value: string, row: number, col: number) => {
 </script>
 
 <template>
-  <h1 style="margin-top: 20%">Sudoku</h1>
+  <h1 style="margin-top: 10%">Sudoku</h1>
   <div class="sudoku-row">
     <div
         v-for="(row, rowIndex) in sudoku.cells"
